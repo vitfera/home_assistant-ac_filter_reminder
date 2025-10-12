@@ -1,0 +1,11 @@
+# Arquivo de serviços para AC Filter Reminder
+# Por enquanto vazio, utilizando apenas o botão para marcar como limpo
+# Futuramente podem ser adicionados serviços customizados aqui
+
+mark_cleaned:
+  name: Marcar filtro como limpo
+  description: Marca o filtro do ar-condicionado como limpo na data/hora atual
+  target:
+    entity:
+      domain: button
+      integration: ac_filter_reminder

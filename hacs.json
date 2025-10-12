@@ -1,0 +1,8 @@
+{
+  "name": "AC Filter Reminder",
+  "content_in_root": false,
+  "domain": "ac_filter_reminder",
+  "render_readme": true,
+  "country": "BR",
+  "homeassistant": "2023.1.0"
+}
