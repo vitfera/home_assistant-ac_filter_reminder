@@ -7,7 +7,7 @@ CONF_REMINDER_HOUR = "reminder_hour"
 CONF_REMINDER_MINUTE = "reminder_minute"
 CONF_NOTIFY_SERVICE = "notify_service"  # ex.: notify.mobile_app_meu_celular
 
-PLATFORMS = ["sensor", "binary_sensor", "number", "button"]
+PLATFORMS = ["sensor", "binary_sensor", "button"]
 DEVICE_MANUFACTURER = "VictorFS"
 DEVICE_MODEL = "AC Filter Reminder"
 

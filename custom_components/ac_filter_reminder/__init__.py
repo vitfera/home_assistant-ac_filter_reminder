@@ -1,6 +1,16 @@
 """Integração AC Filter Reminder para Home Assistant."""
-from __future__ import annotations
+from __future__ import         ents = data.get("entities", {})
+        last_cleaned = ents.get("last_cleaned")
+        due = ents.get("cleaning_due")
+        days_until = ents.get("days_until_due")
+        interval_days = data.get("interval_days", DEFAULT_INTERVAL_DAYS)
 
+        if not (last_cleaned and due):
+            return
+
+        # Se estiver vencido, notifica
+        if due.is_on:
+            _notify(hass, entry, data["name"], last_cleaned.native_value, interval_days, days_until.native_value)
 from datetime import datetime
 import logging
 
@@ -13,7 +23,7 @@ from homeassistant.helpers.typing import ConfigType
 from .const import (
     DOMAIN, PLATFORMS,
     CONF_NAME, CONF_REMINDER_HOUR, CONF_REMINDER_MINUTE, CONF_NOTIFY_SERVICE,
-    DEFAULT_HOUR, DEFAULT_MINUTE
+    CONF_INTERVAL_DAYS, DEFAULT_HOUR, DEFAULT_MINUTE, DEFAULT_INTERVAL_DAYS
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,19 +59,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hour = entry.options.get(CONF_REMINDER_HOUR, entry.data.get(CONF_REMINDER_HOUR, DEFAULT_HOUR))
     minute = entry.options.get(CONF_REMINDER_MINUTE, entry.data.get(CONF_REMINDER_MINUTE, DEFAULT_MINUTE))
     notify_service = entry.options.get(CONF_NOTIFY_SERVICE, entry.data.get(CONF_NOTIFY_SERVICE))
+    interval_days = entry.options.get(CONF_INTERVAL_DAYS, entry.data.get(CONF_INTERVAL_DAYS, DEFAULT_INTERVAL_DAYS))
 
     hass.data[DOMAIN][entry.entry_id] = {
         "name": name,
         "notify_service": notify_service,
         "hour": hour,
         "minute": minute,
+        "interval_days": interval_days,
         "entities": {},
         "unsub": None,
     }
 
-    # Configurar plataformas
+    # Configurar plataformas (removido Platform.NUMBER)
     await hass.config_entries.async_forward_entry_setups(
-        entry, [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.NUMBER, Platform.BUTTON]
+        entry, [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
     )
 
     # Registrar lembrete diário no horário configurado
@@ -143,7 +155,7 @@ def _notify(hass: HomeAssistant, entry: ConfigEntry, ac_name: str,
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Descarregar uma entrada da integração."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        entry, [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.NUMBER, Platform.BUTTON]
+        entry, [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.BUTTON]
     )
     
     data = hass.data[DOMAIN].pop(entry.entry_id, None)

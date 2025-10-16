@@ -18,10 +18,11 @@ Integração personalizada para o Home Assistant que te ajuda a lembrar de **lim
 ### Entidades criadas por dispositivo:
 
 - 📊 **`sensor.ultima_limpeza`** - Data/hora da última limpeza (timestamp)
-- 🔢 **`number.intervalo_dias`** - Intervalo configurável entre limpezas (1-365 dias)
 - ⏰ **`sensor.dias_ate_vencer`** - Quantos dias restam até a próxima limpeza
 - ⚠️ **`binary_sensor.limpeza_vencida`** - Indica se a limpeza está atrasada
 - 🧹 **`button.marcar_como_limpo_agora`** - Botão para registrar limpeza
+
+> **⚙️ Configuração de intervalo:** A entidade `number.intervalo_dias` fica disponível nas configurações do dispositivo, não no dashboard principal.
 
 ## 📦 Instalação
 
@@ -110,11 +111,80 @@ automation:
           color_name: red
 ```
 
-## 📱 Screenshots
+## 📱 Dashboard Recomendado
 
-| Dispositivo no HA | Notificação Mobile | Entidades |
-|---|---|---|
-| *Em breve* | *Em breve* | *Em breve* |
+### **Card: Status dos Filtros**
+```yaml
+type: entities
+title: "🌬️ Status dos Filtros"
+entities:
+  - entity: binary_sensor.ac_sala_limpeza_vencida
+    name: "AC Sala"
+  - entity: binary_sensor.ac_quarto_master_limpeza_vencida  
+    name: "AC Quarto Master"
+  - entity: binary_sensor.ac_quarto_filhos_limpeza_vencida
+    name: "AC Quarto Filhos"
+```
+
+### **Card: Próximas Limpezas**
+```yaml
+type: entities
+title: "📅 Próximas Limpezas"
+entities:
+  - entity: sensor.ac_sala_dias_ate_vencer
+    name: "AC Sala"
+    icon: mdi:air-filter
+  - entity: sensor.ac_quarto_master_dias_ate_vencer
+    name: "AC Quarto Master"
+    icon: mdi:air-filter
+  - entity: sensor.ac_quarto_filhos_dias_ate_vencer
+    name: "AC Quarto Filhos"
+    icon: mdi:air-filter
+```
+
+### **Card: Última Limpeza**
+```yaml
+type: entities
+title: "🕐 Última Limpeza"
+entities:
+  - entity: sensor.ac_sala_ultima_limpeza
+    name: "AC Sala"
+    icon: mdi:calendar-check
+  - entity: sensor.ac_quarto_master_ultima_limpeza
+    name: "AC Quarto Master"
+    icon: mdi:calendar-check
+  - entity: sensor.ac_quarto_filhos_ultima_limpeza
+    name: "AC Quarto Filhos"
+    icon: mdi:calendar-check
+```
+
+### **Card: Botões de Limpeza**
+```yaml
+type: entities  
+title: "🧹 Marcar como Limpo"
+entities:
+  - entity: button.ac_sala_marcar_como_limpo_agora
+    name: "✅ AC Sala"
+  - entity: button.ac_quarto_master_marcar_como_limpo_agora
+    name: "✅ AC Quarto Master"
+  - entity: button.ac_quarto_filhos_marcar_como_limpo_agora
+    name: "✅ AC Quarto Filhos"
+```
+
+### **Card: Dashboard Compacto (Alternativa)**
+```yaml
+type: glance
+title: "🌬️ Filtros AC - Resumo"
+entities:
+  - entity: binary_sensor.ac_sala_limpeza_vencida
+    name: "Sala"
+  - entity: binary_sensor.ac_quarto_master_limpeza_vencida
+    name: "Quarto Master"
+  - entity: binary_sensor.ac_quarto_filhos_limpeza_vencida
+    name: "Quarto Filhos"
+```
+
+> **💡 Nota:** As configurações de intervalo (dias) ficam nas **opções do dispositivo**, não no dashboard. Para alterar, vá em `Dispositivos e Serviços → AC Filter Reminder → Configurar`.
 
 ## 🐛 Problemas Conhecidos
 

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-10-15
+
+### Changed
+- **BREAKING**: Removed `number.interval_days` entity from device dashboard
+- Moved interval configuration to device options (accessible via Configure button)
+- Simplified dashboard view to show only monitoring entities
+- Updated README with cleaner dashboard examples
+
+### Improved
+- Cleaner device interface with only essential monitoring entities
+- Configuration now properly separated from monitoring
+- Better user experience with less cluttered dashboard
+
+### Technical Changes
+- Removed `number.py` platform
+- Updated config_flow to include interval_days configuration
+- Modified sensors to read interval from entry options instead of entity
+- Updated platform list in const.py
+
 ## [1.0.0] - 2024-10-12
 
 ### Added

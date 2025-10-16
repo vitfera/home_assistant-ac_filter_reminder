@@ -50,14 +50,12 @@ class CleaningDueBinary(BinarySensorEntity):
     def is_on(self) -> bool:
         """Return true if cleaning is due."""
         try:
-            data = self.hass.data[DOMAIN][self._entry.entry_id]["entities"]
-            last = data.get("last_cleaned")
-            interval_ent = data.get("interval_days")
+            data = self.hass.data[DOMAIN][self._entry.entry_id]
+            entities = data.get("entities", {})
+            last = entities.get("last_cleaned")
+            interval_days = data.get("interval_days", 60)
             
-            if not interval_ent or interval_ent.native_value is None:
-                return False
-                
-            interval = int(interval_ent.native_value)
+            interval = int(interval_days)
             
             if not last or not last.native_value:
                 return True  # sem histórico => considerar como pendente
@@ -71,27 +69,33 @@ class CleaningDueBinary(BinarySensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return extra state attributes."""
         try:
-            data = self.hass.data[DOMAIN][self._entry.entry_id]["entities"]
-            last = data.get("last_cleaned")
-            interval_ent = data.get("interval_days")
+            data = self.hass.data[DOMAIN][self._entry.entry_id]
+            entities = data.get("entities", {})
+            last = entities.get("last_cleaned")
+            interval_days = data.get("interval_days", 60)
             
-            if last and interval_ent and interval_ent.native_value is not None:
-                days_since = self._days_since(last.native_value) if last.native_value else None
-                interval = int(interval_ent.native_value)
-                
-                attrs = {
-                    "interval_days": interval,
+            interval = int(interval_days)
+            attrs = {
+                "interval_days": interval,
+            }
+            
+            if last and last.native_value:
+                days_since = self._days_since(last.native_value)
+                attrs.update({
                     "days_since_cleaned": days_since,
-                }
-                
-                if days_since is not None:
-                    attrs.update({
-                        "is_overdue": days_since >= interval,
-                        "overdue_days": max(0, days_since - interval),
-                        "days_until_due": max(0, interval - days_since)
-                    })
+                    "is_overdue": days_since >= interval,
+                    "overdue_days": max(0, days_since - interval),
+                    "days_until_due": max(0, interval - days_since)
+                })
+            else:
+                attrs.update({
+                    "days_since_cleaned": None,
+                    "is_overdue": True,
+                    "overdue_days": 0,
+                    "days_until_due": 0
+                })
                     
-                return attrs
+            return attrs
         except Exception:
             pass
             
