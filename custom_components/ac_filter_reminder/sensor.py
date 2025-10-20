@@ -126,16 +126,15 @@ class DaysUntilDueSensor(SensorEntity):
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
         try:
-            data = self.hass.data[DOMAIN][self._entry.entry_id]
-            entities = data.get("entities", {})
-            last = entities.get("last_cleaned")
-            interval_days = data.get("interval_days", 60)
+            data = self.hass.data[DOMAIN][self._entry.entry_id]["entities"]
+            last = data.get("last_cleaned")
+            interval_ent = data.get("interval_days")
             
-            if not last or not last.native_value:
+            if not last or not last.native_value or not interval_ent or interval_ent.native_value is None:
                 return None
                 
             days_since = self._days_since(last.native_value)
-            delta_days = int(interval_days) - days_since
+            delta_days = int(interval_ent.native_value) - days_since
             
             return max(delta_days, 0)
         except Exception:
@@ -145,14 +144,13 @@ class DaysUntilDueSensor(SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return extra state attributes."""
         try:
-            data = self.hass.data[DOMAIN][self._entry.entry_id]
-            entities = data.get("entities", {})
-            last = entities.get("last_cleaned")
-            interval_days = data.get("interval_days", 60)
+            data = self.hass.data[DOMAIN][self._entry.entry_id]["entities"]
+            last = data.get("last_cleaned")
+            interval_ent = data.get("interval_days")
             
-            if last and last.native_value:
+            if last and last.native_value and interval_ent and interval_ent.native_value is not None:
                 days_since = self._days_since(last.native_value)
-                interval = int(interval_days)
+                interval = int(interval_ent.native_value)
                 is_overdue = days_since >= interval
                 
                 return {

@@ -8,7 +8,7 @@ from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
     DOMAIN, CONF_NAME, CONF_REMINDER_HOUR, CONF_REMINDER_MINUTE, CONF_NOTIFY_SERVICE,
-    CONF_INTERVAL_DAYS, DEFAULT_HOUR, DEFAULT_MINUTE, DEFAULT_INTERVAL_DAYS
+    DEFAULT_HOUR, DEFAULT_MINUTE
 )
 
 
@@ -37,8 +37,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.All(int, vol.Range(min=0, max=23)),
             vol.Optional(CONF_REMINDER_MINUTE, default=DEFAULT_MINUTE): 
                 vol.All(int, vol.Range(min=0, max=59)),
-            vol.Optional(CONF_INTERVAL_DAYS, default=DEFAULT_INTERVAL_DAYS):
-                vol.All(int, vol.Range(min=1, max=365)),
             vol.Optional(CONF_NOTIFY_SERVICE, default=""): str,
         })
         
@@ -83,18 +81,12 @@ class OptionsFlow(config_entries.OptionsFlow):
             CONF_NOTIFY_SERVICE, 
             self.config_entry.data.get(CONF_NOTIFY_SERVICE, "")
         )
-        current_interval = self.config_entry.options.get(
-            CONF_INTERVAL_DAYS,
-            self.config_entry.data.get(CONF_INTERVAL_DAYS, DEFAULT_INTERVAL_DAYS)
-        )
 
         schema = vol.Schema({
             vol.Optional(CONF_REMINDER_HOUR, default=current_hour): 
                 vol.All(int, vol.Range(min=0, max=23)),
             vol.Optional(CONF_REMINDER_MINUTE, default=current_minute): 
                 vol.All(int, vol.Range(min=0, max=59)),
-            vol.Optional(CONF_INTERVAL_DAYS, default=current_interval):
-                vol.All(int, vol.Range(min=1, max=365)),
             vol.Optional(CONF_NOTIFY_SERVICE, default=current_notify): str,
         })
         
