@@ -6,6 +6,8 @@
 
 Integração personalizada para o Home Assistant que te ajuda a lembrar de **limpar (não trocar)** o filtro do ar-condicionado em intervalos regulares.
 
+> **🆕 Versão 1.2.0** - Agora com melhor tratamento de erros, notificações aprimoradas e maior estabilidade!
+
 ## ✨ Recursos
 
 - 🏠 **Um dispositivo por ar-condicionado** com entidades completas

@@ -1,5 +1,6 @@
 """Sensores para AC Filter Reminder."""
 from __future__ import annotations
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -14,6 +15,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import (
     DOMAIN, ATTR_LAST_CLEANED, DEVICE_MANUFACTURER, DEVICE_MODEL
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -80,24 +83,36 @@ class LastCleanedSensor(RestoreEntity, SensorEntity):
         return delta.days
 
     async def async_added_to_hass(self) -> None:
-        """Handle entity being added to hass."""
+        """Handle entity being added to hass with improved error handling."""
         await super().async_added_to_hass()
         
         if (state := await self.async_get_last_state()) and state.state not in ("unknown", "unavailable"):
             try:
-                # Tentar diferentes formatos de data
-                if state.state.endswith("Z"):
-                    self._last_value = datetime.fromisoformat(state.state.replace("Z", "+00:00"))
-                elif "+" in state.state or state.state.endswith("UTC"):
-                    self._last_value = datetime.fromisoformat(state.state.replace("UTC", "+00:00"))
+                # Tentar diferentes formatos de data com melhor tratamento
+                state_value = state.state.strip()
+                
+                if state_value.endswith("Z"):
+                    self._last_value = datetime.fromisoformat(state_value.replace("Z", "+00:00"))
+                elif "+" in state_value or state_value.endswith("UTC"):
+                    self._last_value = datetime.fromisoformat(state_value.replace("UTC", "+00:00"))
+                elif "T" in state_value:
+                    self._last_value = datetime.fromisoformat(state_value)
                 else:
-                    self._last_value = datetime.fromisoformat(state.state)
+                    # Tentar formato brasileiro dd/mm/yyyy
+                    try:
+                        self._last_value = datetime.strptime(state_value, "%d/%m/%Y às %H:%M")
+                    except ValueError:
+                        self._last_value = datetime.fromisoformat(state_value)
                     
-                # Garantir que tenha timezone
-                if self._last_value.tzinfo is None:
+                # Garantir que tenha timezone UTC
+                if self._last_value and self._last_value.tzinfo is None:
                     self._last_value = self._last_value.replace(tzinfo=timezone.utc)
                     
-            except Exception:
+            except Exception as err:
+                _LOGGER.warning(
+                    "Erro ao restaurar estado do sensor %s: %s. Usando valor padrão.",
+                    self.entity_id, err
+                )
                 self._last_value = None
 
     async def async_mark_cleaned_now(self) -> None:

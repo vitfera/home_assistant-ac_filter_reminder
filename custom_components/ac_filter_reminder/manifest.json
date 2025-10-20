@@ -1,7 +1,7 @@
 {
   "domain": "ac_filter_reminder",
   "name": "AC Filter Reminder",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "documentation": "https://github.com/vitfera/home_assistant-ac_filter_reminder",
   "issue_tracker": "https://github.com/vitfera/home_assistant-ac_filter_reminder/issues",
   "codeowners": ["@vitfera"],

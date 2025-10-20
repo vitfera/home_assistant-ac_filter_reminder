@@ -99,19 +99,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 def _notify(hass: HomeAssistant, entry: ConfigEntry, ac_name: str, 
            last_cleaned, interval_days, days_until):
-    """Enviar notificações de lembrete."""
-    title = f"Lembrete: limpar filtro do {ac_name}"
+    """Enviar notificações de lembrete com melhor formatação."""
+    title = f"🌬️ Lembrete: limpar filtro do {ac_name}"
     
-    if last_cleaned:
-        last_cleaned_str = last_cleaned.strftime("%d/%m/%Y às %H:%M") if hasattr(last_cleaned, 'strftime') else str(last_cleaned)
-    else:
-        last_cleaned_str = "Nunca"
+    try:
+        if last_cleaned and hasattr(last_cleaned, 'strftime'):
+            last_cleaned_str = last_cleaned.strftime("%d/%m/%Y às %H:%M")
+        elif last_cleaned:
+            last_cleaned_str = str(last_cleaned)
+        else:
+            last_cleaned_str = "Nunca"
+    except Exception:
+        last_cleaned_str = "Data inválida"
+    
+    try:
+        days_until_str = str(days_until) if days_until is not None else "N/A"
+        interval_str = str(interval_days) if interval_days is not None else "N/A"
+    except Exception:
+        days_until_str = "N/A"
+        interval_str = "N/A"
     
     message = (
-        f"Está na hora de LIMPAR (não trocar) o filtro do {ac_name}.\n"
-        f"Última limpeza: {last_cleaned_str}\n"
-        f"Intervalo: {interval_days} dias\n"
-        f"Dias restantes: {days_until if days_until is not None else 'N/A'}"
+        f"Está na hora de LIMPAR (não trocar) o filtro do {ac_name}.\n\n"
+        f"📅 Última limpeza: {last_cleaned_str}\n"
+        f"⏰ Intervalo configurado: {interval_str} dias\n"
+        f"⏳ Dias restantes: {days_until_str}\n\n"
+        f"💡 Após limpar, clique no botão 'Marcar como limpo agora' no dispositivo."
     )
 
     # Notificação persistente
